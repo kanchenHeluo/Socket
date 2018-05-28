@@ -3,9 +3,14 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <string.h>
+#include <sys/shm.h>
+#include <unistd.h>
 
-int main(int argc, char* argv){
-	int server_sockfd;
+#define BUFSIZE 1000
+
+int main(int argc, char** argv){
+	int client_sockfd;
 	int len;
 	struct sockaddr_in remote_addr;
 
@@ -28,21 +33,22 @@ int main(int argc, char* argv){
 	}
 	printf("connect to server/n");
 	len = recv(client_sockfd, buf, BUFSIZE, 0);
-	buf[len] = '/0';
+	buf[len] = 0;
 	printf("%s", buf);
 
 	while(1){
 		printf("Enter string to send");
 		scanf("%s", buf);
-		if(!strcmp(buf, "quit")){
+		if(strcmp(buf, "quit") == 0){
 			break;
 		}
 		len = send(client_sockfd, buf, strlen(buf), 0);
 		len = recv(client_sockfd, buf, BUFSIZE, 0);
 		buf[len] = 0;
-		printf("recv: %s/n", buf);
+		printf("recv: %s\n", buf);
 	}
 
 	close(client_sockfd);
 	return 0;
+}
 
